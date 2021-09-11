@@ -1,0 +1,209 @@
+
+
+library ("pastecs")
+library("car")
+library("ggplot2")
+library("QuantPsyc")
+library("caTools")
+library("mtcars")
+library("readxl")  #package for loading Excel file
+library("jtools")
+library("crunch")
+library("dplyr")
+# Turn off Scientific Notation
+options(scipen = 999)
+
+# Get all 2019 NCAA Football records from local file and load into a R data frame
+recruiting2019 <- read_excel("recruiting2019combined.xlsx")
+
+#Filter data down to only the 5 major football conferences
+majorconf2019 <-filter(recruiting2019, conference %in% c('SEC', 'Big 12', 'Big Ten', 'ACC', 'Pac 12'))
+head(majorconf2019)
+summary(majorconf2019)
+
+cor.test(majorconf2019$wins, majorconf2019$five_year_avg_points)
+
+
+# Filter to each conference separately for regression
+SEC <- majorconf2019[majorconf2019$conference == "SEC",]
+head(SEC)
+
+# Filter to each conference separately for regression
+Big12 <- majorconf2019[majorconf2019$conference == "Big 12",]
+head(Big12)
+
+# Filter to each conference separately for regression
+BigTen <- majorconf2019[majorconf2019$conference == "Big Ten",]
+head(BigTen)
+
+# Filter to each conference separately for regression
+ACC <- majorconf2019[majorconf2019$conference == "ACC",]
+head(ACC)
+
+# Filter to each conference separately for regression
+Pac12 <- majorconf2019[majorconf2019$conference == "Pac 12",]
+head(Pac12)
+
+
+
+# adding a normal distribution line in histogram for wins
+hist(majorconf2019$wins, freq=FALSE, col="gray", xlab="Wins", main=" Wins Histogram", las=1)
+curve(dnorm(x, mean=mean(majorconf2019$wins), sd=sd(majorconf2019$wins)), add=TRUE, col="red") #line
+
+# adding a normal distribution line in histogram for recruiting points
+hist(majorconf2019$five_year_avg_points, freq=FALSE, col="gray", xlab="Avg Recruiting Points", main=" Recruiting Histogram", las=1)
+curve(dnorm(x, mean=mean(majorconf2019$five_year_avg_points), sd=sd(majorconf2019$five_year_avg_points)), add=TRUE, col="red") #line
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = majorconf2019, aes(x =wins , y = (five_year_avg_points))) + 
+   ggtitle("Overall Comparison") +
+  geom_point(position = "jitter") +
+  stat_smooth(method = "lm", se = TRUE)
+
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = ACC, aes(x =wins , y = (five_year_avg_points), col = conference)) + 
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm")
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = BigTen, aes(x =wins , y = (five_year_avg_points), col = conference)) + 
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm")
+
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = Big12, aes(x =wins , y = (five_year_avg_points), col = conference)) + 
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm")
+
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = Pac12, aes(x =wins , y = (five_year_avg_points), col = conference)) + 
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm")
+
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = SEC, aes(x =wins , y = (five_year_avg_points), col = conference)) + 
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm")
+
+
+
+
+
+
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = SEC, aes(x =wins , y = (five_year_avg_points))) +
+  geom_point(aes(alpha = 0.5)) +
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm")
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = SEC, aes(x =wins , y = (five_year_avg_points))) +
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm")
+
+
+
+#Output a scatterplot to give an understanding of the data. 
+ggplot(data = majorconf2019, aes(x = five_year_avg_points, y = (wins), col = conference)) +
+  geom_point(aes(alpha = 0.5)) +
+  geom_point(position = "jitter") +
+  geom_smooth(method = "lm")
+
+simplemodel <-lm(wins ~ five_year_avg_points, data = majorconf2019)
+summary(simplemodel)
+
+##plot(simplemodel)
+
+
+summ(simplemodel)
+
+simplemodelSEC <-lm(wins ~ five_year_avg_points, data = SEC)
+summ(simplemodelSEC)
+
+simplemodelACC <-lm(wins ~ five_year_avg_points, data = ACC)
+summ(simplemodelACC)
+
+simplemodelBigTen <-lm(wins ~ five_year_avg_points, data = BigTen)
+summ(simplemodelBigTen)
+
+simplemodelBig12 <-lm(wins ~ five_year_avg_points, data = Big12)
+summ(simplemodelBig12)
+
+simplemodelPac12 <-lm(wins ~ five_year_avg_points, data = Pac12)
+summ(simplemodelPac12)
+
+
+
+
+# Get all 2019 NCAA Football records from local file and load into a R data frame
+game2019 <- read_excel("gameinfo2019.xlsx")
+head(game2019)
+
+
+
+lgm1 <- glm(home_team_win ~ home_recruiting_dff , data = game2019, family = binomial()  )
+summary(lgm1)
+
+
+# Split the data into training and validation data sets
+split <- sample.split(game2019, SplitRatio = 0.8)
+split
+train <- subset(game2019, split == "TRUE")
+validate <- subset(game2019, split == "FALSE")
+
+# Train model using training data set
+lgm2 <- glm(home_team_win ~ home_recruiting_dff , data = game2019, family = binomial()  )
+summary(lgm2)
+
+# Run validation data through the model built on training data
+res <- predict(lgm2, validate, type = "response")
+res
+
+res2 <-predict(lgm2, train, type = "response")
+res2
+
+#Validate model using confusion matrix
+confmatrix <- table(Actual_Value=train$home_team_win, Predicted_Value = res2 >0.5)
+confmatrix
+
+#Accuracy
+(confmatrix[[1,1]] + confmatrix[[2,2]])/sum(confmatrix)
+
+
+
+range(game2019$home_recruiting_dff)
+
+
+
+xnumeracy <-seq(-150, 150, 20)
+
+ynumeracy <- predict(lgm2, list(home_recruiting_dff=xnumeracy),type="response")
+
+
+plot(game2019$home_recruiting_dff, game2019$home_team_win, pch = 16, xlab = "recruting point difference", ylab = "home_team_win")
+
+lines(xnumeracy, ynumeracy, col = "red", lwd = 2)
+
+
+library(pROC)
+test_prob = predict(lgm2, newdata = game2019, type = "response")
+test_roc = roc(game2019$home_team_win ~ test_prob, plot = TRUE, print.auc = TRUE)
+
+
+
+
+predict(simplemodel, data.frame(five_year_avg_points = 350))
+
