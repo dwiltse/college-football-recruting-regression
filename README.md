@@ -16,12 +16,12 @@ between winning and losing.
 
 The data used on this project came from a collge football API for R that utilized the resources below.  The analysis used the following metrics, defined below:
  
-  Season Data 
+  #### Season Data 
   1) Team - College football teams from the five major football conferences (ACC, Big Ten, Big 12, Pac 12, and SEC)
   2) Wins - Total Wins by the team during the 2019 season.
   3) Five Year Average Recruiting Points - Average recruiting points (as determined by year by collegefootlldata.com) across last 5 recruiting classes (2015-2019)
 
-  Game Data
+  #### Game Data
   1) Home Team - Team hosting the game (or determined home team on neutral site)
   2) Home Team Score - Final score of game by home team
   3) Away Team - Visit team of game
