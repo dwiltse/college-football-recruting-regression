@@ -12,7 +12,7 @@ between winning and losing.
 
 ## How I addressed problem statement
 
-###Data
+### Data
 
 The data used on this project came from a collge football API for R that utilized the resources below.  The analysis used the following metrics, defined below:
  
@@ -36,7 +36,7 @@ Resources:
   1) https://github.com/meysubb/cfbscrapR
   2) https://collegefootballdata.com/
 
-###Methodolgy
+### Methodolgy
 
 I addressed the problem statement in two ways:
   
